@@ -2,6 +2,8 @@
 #include <thread>
 #include <set>
 
+using namespace std;
+
 void a(int a, int b){
     std::cout << "Hello function a(" << a << b << ")"<< std::endl;
 }
@@ -14,6 +16,6 @@ int main(){
     std::cout << "Hello world" << std::endl;
 
     std::set<int> st = {1, 2};
-    st.contains(1);
+    cout << (st.contains(1));
 
 }
