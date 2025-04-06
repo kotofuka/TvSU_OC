@@ -107,8 +107,6 @@ int main(){
     const unsigned int proces_count = thread::hardware_concurrency();
     solveForMatrixOnN(3, proces_count);
     solveForMatrixOnN(100, proces_count);
-    solveForMatrixOnN(1000, proces_count);
-    solveForMatrixOnN(10000, proces_count);
-    
+    solveForMatrixOnN(1000, proces_count);    
     return 0;
 }
