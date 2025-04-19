@@ -1,8 +1,5 @@
 {
-    "C_Cpp.errorSquiggles": "disabled",
     "files.associations": {
-        "iosfwd": "cpp",
-        "ostream": "cpp",
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
@@ -48,12 +45,14 @@
         "fstream": "cpp",
         "initializer_list": "cpp",
         "iomanip": "cpp",
+        "iosfwd": "cpp",
         "iostream": "cpp",
         "istream": "cpp",
         "limits": "cpp",
         "mutex": "cpp",
         "new": "cpp",
         "numbers": "cpp",
+        "ostream": "cpp",
         "ranges": "cpp",
         "semaphore": "cpp",
         "span": "cpp",

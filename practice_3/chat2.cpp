@@ -15,10 +15,11 @@ void writer_to_console(){
         std::getline(std::cin, message);
         if (!message.empty()){
             WaitForSingleObject(hSemaphore, INFINITE);
-            std::ofstream txt;
-            txt.open(filename);
-            txt << username << ": " << message << std::endl;
-            txt.close();
+            std::ofstream txt(filename, std::ios::app);
+            if (txt.is_open()){
+                txt << username << ": " << message << std::endl;
+                txt.close();
+            }
             ReleaseSemaphore(hSemaphore, 1, NULL);
         }
     }
