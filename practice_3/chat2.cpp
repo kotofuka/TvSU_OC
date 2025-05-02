@@ -9,7 +9,7 @@ std::string filename = "chat.txt";
 std::string username;
 std::streampos last_read_pos = 0;
 
-void writer_to_console(){
+void reader_from_console(){
     std::string message;
     while(true){
         std::getline(std::cin, message);
@@ -25,7 +25,7 @@ void writer_to_console(){
     }
 }
 
-void reader_from_console(){
+void writer_to_console(){
     while(true){
         WaitForSingleObject(hSemaphore, INFINITE);
         std::ifstream txt(filename);
