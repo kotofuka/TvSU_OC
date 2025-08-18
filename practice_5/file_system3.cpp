@@ -19,17 +19,26 @@ const int file_size = 8;
 const int NUM_Of_TESTS = 20;
 std::list<File> files; // Изменено на std::list
 
+
 int find_file(const std::string& name) {
     for (auto it = files.begin(); it != files.end(); ++it) {
-        if (it->name == name) {
-            return std::distance(files.begin(), it);
+        if (it->mutex.try_lock()) { // Попытка захватить мьютекс
+            if (it->name == name) {
+                return std::distance(files.begin(), it);
+            }
+            it->mutex.unlock(); // Разблокируем, если не нашли
         }
     }
     return -1;
 }
 
 void create_file(const std::string& name) {
-    if (find_file(name) != -1) return;
+    int i = find_file(name);
+    if (i != -1) {
+        (std::next(files.begin(), i))->mutex.unlock();
+        return;
+    }
+    std::cout << "create file " << name << std::endl;
     files.emplace_back(name); // Создаем объект напрямую в списке
 }
 
@@ -37,11 +46,8 @@ void delete_file(const std::string& name) {
     int i = find_file(name);
     if (i == -1) return;
     auto it = std::next(files.begin(), i);
-    // while(!it->mutex.try_lock()){
-    //     std::cout<< "not lock for delete" << std::endl;
-    // }
-    std::lock_guard<std::mutex> lock(it->mutex);
     std::cout << "delete " << name << std::endl;
+    it->mutex.unlock();
     files.erase(it);
 }
 
@@ -49,23 +55,22 @@ void write_file(const std::string& name, const std::string& content) {
     int i = find_file(name);
     if (i == -1) return;
     auto it = std::next(files.begin(), i);
-    std::lock_guard<std::mutex> lock(it->mutex);
-    std::cout<< "write" << std::endl;
+    // std::lock_guard<std::mutex> lock(it->mutex);
+    std::cout<< "write \"file\"" << name << std::endl;
     it->content = content;
+    it->mutex.unlock();
 }
 
 void read_file(const std::string& name) {
     int i = find_file(name);
     if (i == -1) {
-        std::cout << "file \"" << name << "\" is not found" << std::endl << std::endl;
+        std::cout << "read file \"" << name << "\" is not found" << std::endl << std::endl;
         return;
     }
     auto it = std::next(files.begin(), i);
-    std::lock_guard<std::mutex> lock(it->mutex);
-    i = find_file(name);
-    if (i == -1) return;
-    it = std::next(files.begin(), i);
-    std::cout << "file \"" << name << "\": " << it->content << std::endl << std::endl;
+    // std::lock_guard<std::mutex> lock(it->mutex);
+    std::cout << "read file \"" << it->name << "\": " << it->content << std::endl << std::endl;
+    it->mutex.unlock();
 }
 
 void randomize_action(int x){
@@ -74,6 +79,7 @@ void randomize_action(int x){
         std::string filename = "file" + std::to_string(i);
         create_file(filename);// create
         for(size_t j = 0; j<NUM_Of_TESTS; ++j) {
+            std::cout << "thread_" << x << std::endl; 
             switch(rand() % 8) {
                 case 0: 
                     create_file(filename); 
@@ -122,6 +128,6 @@ int main() {
     for(auto &th : threads){
         th.join();
     }
-    // std::cout << "finish" << std::endl;
+    std::cout << "finish" << std::endl;
     return 0;
 }
