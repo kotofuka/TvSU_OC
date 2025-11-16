@@ -18,13 +18,19 @@
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
-int func(int iResult, SOCKET ClientSocket, char* recvbuf, int recvbuflen, int iSendResult){
+int func(SOCKET ClientSocket, char* recvbuf, int recvbuflen, int i){
     // Receive until the peer shuts down the connection
+	int iResult;
+	int iSendResult;
         do {
         
             iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
             if (iResult > 0) {
                 printf("Bytes received: %d\n", iResult);
+
+                // Sleep для демонстрации обработки
+			    printf("%d task Processing...\n", i);
+			    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
             // Echo the buffer back to the sender
                 iSendResult = send( ClientSocket, recvbuf, iResult, 0 );
@@ -38,6 +44,8 @@ int func(int iResult, SOCKET ClientSocket, char* recvbuf, int recvbuflen, int iS
             }
 
         } while (iResult > 0);
+
+        printf("%d thread finished\n", i);
 
         return 0;
 }
@@ -107,6 +115,8 @@ int __cdecl main(void)
         WSACleanup();
         return 1;
     }
+    
+    int i = 0;
 
     while (true){
 
@@ -118,10 +128,10 @@ int __cdecl main(void)
             WSACleanup();
             return 1;
         }
+        printf("Client connected!\n");
+        std::thread th(func, ClientSocket, recvbuf, recvbuflen, ++i);
 
-        std::thread th(func, iResult, ClientSocket, recvbuf, recvbuflen, iSendResult);
-
-        th.join(); // переместить в другое место
+        th.detach();
     }
 
     // cleanup
